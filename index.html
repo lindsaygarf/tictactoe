@@ -1,0 +1,132 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="tictactoeStyle.css">
+
+        <script>
+
+            // cellClicked
+            // Parameters: index: the index of the cell that was clicked
+            // Purpose:    Handle the event where a cell is clicked. It puts an X 
+            //             or an O in the cell, depending on whose turn it is and 
+            //             updates the turnMessage
+            // Returns:    none
+            function cellClicked(index) {
+                if (gameEnded == false && cells[index].textContent == "") {
+                    cells[index].textContent = currentTurn;
+                    checkIfWon();
+                    if(gameEnded == false) {
+                        // change whose turn it is
+                        if (currentTurn == "X") {
+                            currentTurn = "O";
+                        } else if (currentTurn == "O") {
+                            currentTurn = "X";
+                        }
+
+                        // display whose turn it is
+                        turnMessage.textContent = `It's Player ${currentTurn}'s turn`;
+
+                        checkDraw();
+                    }
+                }
+            }
+
+            // create an array holding all index combinations where a win could occur
+            winningCombos = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], 
+                             [1,4,7], [2,5,8], [0,4,8], [2,4,6]];
+
+
+            // checkIfWon
+            // Parameters: none
+            // Purpose:    check if there is a win by checking each index combination 
+            //             to see if they hold the same character
+            // Returns:    none
+            function checkIfWon() {
+                for (n = 0; n < winningCombos.length; n++) {
+                    // store current indicies being checked
+                    [a,b,c] = winningCombos[n];
+                    
+                    if(cells[a].textContent != "" && cells[a].textContent == cells[b].textContent && 
+                       cells[a].textContent == cells[c].textContent) {
+                        turnMessage.textContent = `Player ${currentTurn} has won! Congraulations!`;
+                        gameEnded = true;
+                    }
+                }
+            }
+
+            // checkDraw
+            // Parameters: none
+            // Purpose:    check if there is a stalemate by checking if all boxes are 
+            //             full, but nobody won
+            // Returns:    none
+            function checkDraw() {
+                let draw = true;
+                if (gameEnded == false) {
+                    for (n = 0; n < cells.length; n++) {
+                        if (cells[n].textContent == "") {
+                            // if one is empty, it cannot be a stalemate
+                            draw = false;
+                            break;
+                        }
+                    }
+                }
+                if (draw == true) {
+                    turnMessage.textContent = "There is a stalemate!"
+                    gameEnded = true;
+                }
+            }
+
+            // restartClicked
+            // Parameters: none
+            // Purpose:    Handles the event where the restart button is clicked.
+            //             It resets all cells to be empty and starts the game over
+            // Returns:    none
+            function restartClicked() {
+                for (let j = 0; j < cells.length; j++) {
+                    cells[j].textContent = ""
+                    cells[j].addEventListener("click", function() { cellClicked(j); });
+                }
+                turnMessage.textContent = `It's Player ${currentTurn}'s turn`
+                gameEnded = false;
+            }
+            
+        </script>
+    </head>
+    <body>
+        <h1>Tic Tac Toe</h1>
+        <p id="turnMessage"></p>
+        <div id="gameBoard"></div>
+        <button id="playAgain">Restart Game</button>
+        <script>
+            const gameBoard = document.getElementById("gameBoard");
+            const restartButton = document.getElementById("playAgain");
+            const turnMessage = document.getElementById("turnMessage");
+            const cells = [];
+            let currentTurn = "";
+
+            // randonly assign who gets to start first
+            if (Math.random() < 0.5) {
+                currentTurn = "X";
+            } else {
+                currentTurn = "O";
+            }
+
+            let gameEnded = false;
+
+            turnMessage.textContent = `It's Player ${currentTurn}'s turn`
+
+            for(let i = 0; i < 9; i++) {
+                const cell = document.createElement("div");
+                cell.className = "cell";
+                gameBoard.append(cell);
+                cells.push(cell);
+
+                // allow all cells to be clicked
+                cell.addEventListener("click", function() {cellClicked(i);});
+            }
+            
+            restartButton.addEventListener("click", function() {restartClicked();})
+
+            
+        </script>
+    </body>
+</html>
